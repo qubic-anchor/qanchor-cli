@@ -1,0 +1,25 @@
+name: "{{project_name}}"
+version: "0.1.0"
+description: "A basic Oracle contract built with QAnchor"
+author: "Your Name <your.email@example.com>"
+
+[contract]
+name = "{{project_name_pascal}}Oracle"
+source = "src/lib.rs"
+qidl = "src/oracle.qidl"
+
+[build]
+target = "wasm32-unknown-unknown"
+optimization = true
+
+[networks]
+local = "http://localhost:8080"
+testnet = "https://testnet-rpc.qubic.org"
+mainnet = "https://rpc.qubic.org"
+
+[dependencies]
+qubic-sdk = "0.1.0"
+
+[dev-dependencies]
+qanchor-testing = "0.1.0"
+

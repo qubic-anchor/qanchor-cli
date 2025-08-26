@@ -1,0 +1,36 @@
+[package]
+name = "qanchor-cli"
+version = "0.1.0"
+edition = "2021"
+description = "The Anchor for Qubic - Modern development framework"
+authors = ["QAnchor Team <team@qanchor.dev>"]
+license = "MIT"
+repository = "https://github.com/qubic-anchor/qanchor-cli"
+homepage = "https://qanchor.dev"
+keywords = ["qubic", "blockchain", "cli", "development", "framework"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "qanchor"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+colored = "2.0"
+indicatif = "0.17"
+reqwest = { version = "0.11", features = ["json"] }
+tempfile = "3.0"
+handlebars = "4.0"
+walkdir = "2.0"
+rand = "0.8"
+
+[dev-dependencies]
+tempfile = "3.0"
+assert_cmd = "2.0"
+predicates = "3.0"

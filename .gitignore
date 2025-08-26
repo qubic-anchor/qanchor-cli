@@ -1,0 +1,24 @@
+# Rust 編譯產生的檔案
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE 檔案
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS 產生的檔案
+.DS_Store
+Thumbs.db
+
+# Demo 測試專案
+/hello-qubic/
+/test-*/
+
+# 臨時檔案
+*.tmp
+*.temp
+.cache/

@@ -1,0 +1,182 @@
+{
+  "version": "1.0.0",
+  "program": {
+    "name": "{{project_name_pascal}}Oracle",
+    "description": "A basic Oracle contract for price feeds",
+    "version": "0.1.0",
+    "authors": ["{{project_name}} developer"]
+  },
+  "instructions": [
+    {
+      "name": "Initialize",
+      "description": "Initialize the Oracle with an authority",
+      "args": [
+        {
+          "name": "authority",
+          "type": "PublicKey",
+          "description": "The authority public key for this Oracle"
+        }
+      ],
+      "accounts": [
+        {
+          "name": "oracle",
+          "type": "{{project_name_pascal}}Oracle",
+          "mutable": true,
+          "description": "Oracle state account"
+        }
+      ]
+    },
+    {
+      "name": "UpdatePrice",
+      "description": "Update asset price with validation",
+      "args": [
+        {
+          "name": "asset_id",
+          "type": "string",
+          "description": "Asset identifier (e.g., 'BTC', 'ETH')",
+          "validation": {
+            "min_length": 1,
+            "max_length": 10
+          }
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "description": "Price in smallest unit",
+          "validation": {
+            "min": 1
+          }
+        },
+        {
+          "name": "timestamp",
+          "type": "u64",
+          "description": "Unix timestamp of price update"
+        }
+      ],
+      "accounts": [
+        {
+          "name": "oracle",
+          "type": "{{project_name_pascal}}Oracle",
+          "mutable": true,
+          "description": "Oracle state account"
+        },
+        {
+          "name": "authority",
+          "type": "PublicKey",
+          "mutable": false,
+          "description": "Oracle authority/owner"
+        }
+      ]
+    },
+    {
+      "name": "GetPrice",
+      "description": "Retrieve current asset price",
+      "args": [
+        {
+          "name": "asset_id",
+          "type": "string",
+          "description": "Asset identifier"
+        }
+      ],
+      "accounts": [
+        {
+          "name": "oracle",
+          "type": "{{project_name_pascal}}Oracle",
+          "mutable": false
+        }
+      ],
+      "returns": {
+        "type": "PriceData",
+        "description": "Current price information"
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "name": "{{project_name_pascal}}Oracle",
+      "description": "Main oracle state storage",
+      "fields": [
+        {
+          "name": "authority",
+          "type": "PublicKey",
+          "description": "Oracle owner"
+        },
+        {
+          "name": "prices",
+          "type": "HashMap<String, PriceData>",
+          "description": "Asset price mappings"
+        },
+        {
+          "name": "last_updated",
+          "type": "u64",
+          "description": "Last update timestamp"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "PriceData",
+      "description": "Price information structure",
+      "fields": [
+        {
+          "name": "value",
+          "type": "u64",
+          "description": "Price value"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64",
+          "description": "Price timestamp"
+        },
+        {
+          "name": "confidence",
+          "type": "u8",
+          "description": "Confidence level (0-100)"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "PriceUpdated",
+      "description": "Emitted when asset price is updated",
+      "fields": [
+        {
+          "name": "asset_id",
+          "type": "string"
+        },
+        {
+          "name": "old_price",
+          "type": "u64"
+        },
+        {
+          "name": "new_price",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidTimestamp",
+      "message": "Provided timestamp is invalid or outdated"
+    },
+    {
+      "code": 6001,
+      "name": "AssetNotFound",
+      "message": "Requested asset ID was not found"
+    },
+    {
+      "code": 6002,
+      "name": "Unauthorized",
+      "message": "Only oracle authority can perform this action"
+    }
+  ]
+}
+
