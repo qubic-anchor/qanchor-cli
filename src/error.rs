@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 #[derive(Error, Debug)]
+#[allow(dead_code)]
 pub enum QAnchorError {
     #[error("Project directory '{0}' already exists")]
     DirectoryExists(String),
@@ -30,5 +31,6 @@ pub enum QAnchorError {
     Deploy(String),
 }
 
+#[allow(dead_code)]
 pub type Result<T> = std::result::Result<T, QAnchorError>;
 

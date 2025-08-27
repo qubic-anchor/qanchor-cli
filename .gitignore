@@ -22,5 +22,19 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+
+# 內部開發文檔 (不對外公開)
 Projectplan.md
 QAnchor_Rust_CLI_Implementation_Plan.md
+QA_*.md
+*_Report.md
+License_Addition_Report.md
+README_Update_Report.md
+Git_Push_Preparation.md
+
+# 營銷和公告檔案 (內部使用)
+twitter-announcement.md
+
+# 開發測試專案目錄
+test-sdk-gen/
+tmp-acceptance-proj/

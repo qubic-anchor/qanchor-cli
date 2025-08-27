@@ -1,0 +1,38 @@
+// Generated TypeScript client for {{program.name}}
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
+import * as types from './types';
+
+/**
+ * {{program.description}}
+ */
+export class {{program.name}}Client {
+  private connection: Connection;
+  private programId: PublicKey;
+
+  constructor(connection: Connection, programId: string) {
+    this.connection = connection;
+    this.programId = new PublicKey(programId);
+  }
+
+  {{#each instructions}}
+  /**
+   * {{description}}
+   */
+  async {{name}}(args: types.{{name}}Args): Promise<Transaction> {
+    // TODO: Implement instruction {{name}}
+    console.log('Calling {{name}} with args:', args);
+    throw new Error('{{name}} not implemented yet');
+  }
+
+  {{/each}}
+
+  /**
+   * Get program account info
+   */
+  async getProgramInfo(): Promise<any> {
+    return this.connection.getAccountInfo(this.programId);
+  }
+}
+
+// Re-export types for convenience
+export * as types from './types';

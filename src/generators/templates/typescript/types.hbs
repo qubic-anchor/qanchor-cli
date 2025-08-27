@@ -1,0 +1,54 @@
+// Generated TypeScript types for {{program.name}}
+// Description: {{program.description}}
+// Version: {{program.version}}
+
+{{#each types}}
+/**
+ * {{description}}
+ */
+export interface {{name}} {
+  {{#each fields}}
+  /** {{description}} */
+  {{name}}: {{type}};
+  {{/each}}
+}
+
+{{/each}}
+
+{{#each instructions}}
+/**
+ * {{description}}
+ */
+export interface {{name}}Args {
+  {{#each args}}
+  /** {{description}} */
+  {{name}}: {{type}};
+  {{/each}}
+}
+
+{{/each}}
+
+// Event types
+{{#each events}}
+/**
+ * {{description}}
+ */
+export interface {{name}}Event {
+  {{#each fields}}
+  {{ name}}: {{type}};
+  {{/each}}
+}
+
+{{/each}}
+
+// Error types
+export enum ErrorCode {
+  {{#each errors}}
+  {{name}} = {{code}},
+  {{/each}}
+}
+
+export interface QAnchorError {
+  code: ErrorCode;
+  message: string;
+}

@@ -2,8 +2,10 @@ use anyhow::{Result, Context};
 use handlebars::Handlebars;
 use serde_json::json;
 use std::path::Path;
+use chrono::Datelike;
 
 pub struct Template {
+    #[allow(dead_code)]
     name: String,
     handlebars: Handlebars<'static>,
 }
@@ -21,6 +23,7 @@ impl Template {
                 handlebars.register_template_string("README.md", include_str!("basic_oracle/README.md"))?;
                 handlebars.register_template_string("test.ts", include_str!("basic_oracle/test.ts"))?;
                 handlebars.register_template_string(".gitignore", include_str!("basic_oracle/gitignore"))?;
+                handlebars.register_template_string("LICENSE", include_str!("basic_oracle/LICENSE"))?;
             }
             _ => anyhow::bail!("Unknown template: {}", template_name),
         }
@@ -32,11 +35,13 @@ impl Template {
     }
     
     pub async fn generate(&self, target_path: &Path, project_name: &str) -> Result<()> {
+        let current_year = chrono::Utc::now().year();
         let context = json!({
             "project_name": project_name,
             "project_name_snake": project_name.replace("-", "_"),
             "project_name_upper": project_name.to_uppercase(),
             "project_name_pascal": to_pascal_case(project_name),
+            "year": current_year,
         });
         
         // 建立目錄結構
@@ -50,6 +55,7 @@ impl Template {
         self.render_file("README.md", &target_path.join("README.md"), &context)?;
         self.render_file("test.ts", &target_path.join("tests/oracle.test.ts"), &context)?;
         self.render_file(".gitignore", &target_path.join(".gitignore"), &context)?;
+        self.render_file("LICENSE", &target_path.join("LICENSE"), &context)?;
         
         Ok(())
     }

@@ -3,6 +3,10 @@ mod config;
 mod templates;
 mod utils;
 mod error;
+// Phase 2 新增模組
+mod qidl;
+mod generators;
+mod localnet;
 
 use cli::commands::Commands;
 use clap::Parser;

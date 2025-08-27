@@ -6,6 +6,10 @@ pub mod init;
 pub mod build;
 pub mod deploy;
 pub mod test;
+// Phase 2 新增指令
+pub mod generate;
+pub mod localnet;
+pub mod clean;
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -47,6 +51,36 @@ pub enum Commands {
         #[arg(short, long)]
         verbose: bool,
     },
+    /// Generate SDK for different languages
+    Generate {
+        /// Target language (ts, py)
+        #[arg(short, long)]
+        lang: String,
+        /// Output directory
+        #[arg(short, long, default_value = "./generated")]
+        output: String,
+        /// QIDL input file
+        #[arg(short, long, default_value = "src/oracle.qidl")]
+        input: String,
+    },
+    /// Start local Qubic test network
+    Localnet {
+        /// Port to bind
+        #[arg(short, long, default_value = "8899")]
+        port: u16,
+        /// Reset state
+        #[arg(short, long)]
+        reset: bool,
+    },
+    /// Clean build artifacts and cache
+    Clean {
+        /// Clean only cache
+        #[arg(long)]
+        cache_only: bool,
+        /// Verbose output
+        #[arg(short, long)]
+        verbose: bool,
+    },
 }
 
 impl Commands {
@@ -67,6 +101,18 @@ impl Commands {
             Commands::Test { pattern, verbose } => {
                 println!("{}", "🧪 Running tests...".bold());
                 test::execute(pattern.as_deref(), *verbose).await
+            }
+            Commands::Generate { lang, output, input } => {
+                println!("{} {} SDK to {}", "🔧 Generating".bold(), lang.cyan(), output.cyan());
+                generate::execute(lang, output, input).await
+            }
+            Commands::Localnet { port, reset } => {
+                println!("{} {}", "🌐 Starting local network on port".bold(), port.to_string().cyan());
+                localnet::execute(*port, *reset).await
+            }
+            Commands::Clean { cache_only, verbose } => {
+                println!("{}", "🧹 Cleaning project...".bold());
+                clean::execute(*cache_only, *verbose).await
             }
         }
     }

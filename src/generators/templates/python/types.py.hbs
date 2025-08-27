@@ -1,0 +1,55 @@
+"""Generated Python types for {{program.name}}
+{{program.description}}
+Version: {{program.version}}
+"""
+
+from dataclasses import dataclass
+from typing import Dict, List, Any, Optional
+from enum import IntEnum
+
+{{#each types}}
+@dataclass
+class {{name}}:
+    """{{description}}"""
+    {{#each fields}}
+    {{name}}: {{type}}  # {{description}}
+    {{/each}}
+
+{{/each}}
+
+# Instruction argument types
+{{#each instructions}}
+@dataclass
+class {{name}}Args:
+    """{{description}}"""
+    {{#each args}}
+    {{name}}: {{type}}  # {{description}}
+    {{/each}}
+
+{{/each}}
+
+# Event types
+{{#each events}}
+@dataclass
+class {{name}}Event:
+    """{{description}}"""
+    {{#each fields}}
+    {{name}}: {{type}}
+    {{/each}}
+
+{{/each}}
+
+# Error codes
+class ErrorCode(IntEnum):
+    {{#each errors}}
+    {{name}} = {{code}}  # {{message}}
+    {{/each}}
+
+@dataclass
+class QAnchorError(Exception):
+    """QAnchor SDK Error"""
+    code: ErrorCode
+    message: str
+    
+    def __str__(self) -> str:
+        return f"QAnchorError({self.code.name}): {self.message}"

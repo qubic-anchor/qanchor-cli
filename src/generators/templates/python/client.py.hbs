@@ -1,0 +1,46 @@
+"""Generated Python client for {{program.name}}
+{{program.description}}
+"""
+
+import asyncio
+from typing import Any, Optional
+from . import types
+
+class {{program.name}}Client:
+    """{{program.description}}"""
+    
+    def __init__(self, connection: Any, program_id: str):
+        """Initialize the client
+        
+        Args:
+            connection: Qubic connection instance
+            program_id: Program ID string
+        """
+        self.connection = connection
+        self.program_id = program_id
+    
+    {{#each instructions}}
+    async def {{name}}(self, args: types.{{name}}Args) -> Any:
+        """{{description}}
+        
+        Args:
+            args: {{name}} instruction arguments
+            
+        Returns:
+            Transaction result
+        """
+        # TODO: Implement instruction {{name}}
+        print(f"Calling {{name}} with args: {args}")
+        raise NotImplementedError("{{name}} not implemented yet")
+    
+    {{/each}}
+    
+    async def get_program_info(self) -> Optional[Any]:
+        """Get program account info"""
+        # TODO: Implement program info retrieval
+        return None
+    
+    async def close(self):
+        """Close the client connection"""
+        if hasattr(self.connection, 'close'):
+            await self.connection.close()
