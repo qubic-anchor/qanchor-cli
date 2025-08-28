@@ -99,7 +99,7 @@ This is a significant milestone release that brings QAnchor from a development f
 
 ---
 
-## [0.2.0] - 2025-01-25
+## [0.2.0] - 2025-08-15
 
 ### Added
 - TypeScript SDK generation
@@ -115,7 +115,7 @@ This is a significant milestone release that brings QAnchor from a development f
 
 ---
 
-## [0.1.0] - 2025-01-15
+## [0.1.0] - 2025-08-01
 
 ### Added
 - Initial release of QAnchor CLI
