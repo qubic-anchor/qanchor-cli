@@ -33,8 +33,9 @@ cd my-oracle
 
 # Complete development workflow
 qanchor build                                    # Compile contract
-qanchor deploy --network local                  # Deploy to local network
-qanchor test                                     # Run tests
+qanchor deploy --network mainnet --yes          # Deploy to Qubic mainnet
+qanchor test --network mainnet                  # Run tests on mainnet
+qanchor logs --tail 10 --network mainnet        # View recent contract logs
 
 # Generate client SDKs
 qanchor generate --lang ts --output ./ts-sdk    # TypeScript SDK
@@ -120,6 +121,8 @@ my-oracle/                      # Your project name
 ## 🎯 Features
 
 ### ✅ Currently Available
+
+#### **Phase 1 & 2 (Core Framework)**
 - 🔥 **Zero Learning Curve**: If you know Anchor, you know QAnchor
 - ⚡ **30-Second Setup**: From zero to running in 30 seconds
 - 🛡️ **Type Safety**: QIDL-driven SDK generation (TypeScript & Python)
@@ -130,11 +133,19 @@ my-oracle/                      # Your project name
 - ✅ **SDK Generation** - TypeScript and Python client libraries
 - ✅ **Comprehensive Testing** - Integration tests and validation
 
-### 🚧 Coming Soon (Phase 3)
+#### **Phase 3 (Production Features) - NEW! 🆕**
+- 🌐 **Real Network Integration** - Deploy to Qubic mainnet/testnet
+- 💳 **Wallet Management** - Create, import, and manage development wallets
+- 📊 **Network Diagnostics** - Real-time network status and performance monitoring
+- 📋 **Contract Logs** - View, filter, and stream contract execution logs
+- 🚀 **Production Deployment** - Pre-deployment validation and error checking
+- ⚡ **Performance Monitoring** - Network ping tests and connection analysis
+
+### 🚧 Coming Soon (Phase 3 Remaining)
 - 🧪 **Time Travel Testing**: Snapshot and replay capabilities
 - 🎨 **IDE Integration**: Full VSCode support with syntax highlighting
-- 🌐 **Real Network Integration**: Mainnet and testnet support
 - 📦 **Package Registry**: npm and PyPI publishing
+- 🏛️ **Enterprise Features**: Advanced security and compliance tools
 
 ## 📚 Command Reference
 
@@ -158,6 +169,18 @@ Start a local Qubic test network for development.
 
 ### `qanchor clean [--cache-only]`
 Clean build artifacts and cache files.
+
+### `qanchor upgrade --contract-id <id> [--network <network>]`
+Upgrade an existing contract on the specified network.
+
+### `qanchor wallet <create|import|list|balance|send>`
+Wallet management commands for development and testing.
+
+### `qanchor network <status|ping> [--network <network>]`
+Network diagnostics and health checking tools.
+
+### `qanchor logs [--follow] [--tail <n>] [--since <time>] [--filter <keyword>]`
+View contract logs with real-time streaming and filtering capabilities.
 
 ### `qanchor --version`
 Display QAnchor CLI version information.
@@ -339,11 +362,13 @@ curl http://localhost:8899/health
 - ✅ Enhanced error handling
 - ✅ Comprehensive integration tests
 
-**Phase 3 (Ecosystem) - 📋 Planned**
-- Real Qubic network integration
-- VSCode extension
-- Package registry (crates.io, npm)
-- Community template library
+**Phase 3 (Ecosystem) - 🔄 In Progress**
+- ✅ **Real Qubic network integration** - Complete mainnet/testnet support
+- ✅ **Advanced CLI commands** - wallet, network diagnostics, logs
+- ✅ **Production-ready deployment** - Pre-deployment validation workflow
+- 🔄 **VSCode extension** - Syntax highlighting and IntelliSense
+- 🔄 **Package registry** - crates.io, npm publishing
+- 🔄 **Community template library** - Shared project templates
 
 ## 🎬 Demo
 
@@ -351,17 +376,32 @@ curl http://localhost:8899/health
 
 Complete demonstration of the development workflow from initialization to deployment.
 
-**Complete Development Workflow**:
+**Complete Development Workflow (v0.3.0)**:
 ```bash
 # Full feature demonstration
-qanchor --version                           # Show version
+qanchor --version                           # Show version (v0.3.0)
 qanchor init my-oracle                      # Create project (5s)
 cd my-oracle                               
+
+# Core development cycle
 qanchor build                               # Compile contract (8s)
-qanchor deploy --network local              # Deploy contract (5s)
-qanchor test                                # Run tests (3s)
+qanchor deploy --network mainnet --yes      # Deploy to mainnet (5s)
+qanchor test --network mainnet              # Run tests on mainnet (3s)
+
+# Network diagnostics and monitoring
+qanchor network status --network mainnet    # Check network health
+qanchor network ping --network mainnet --count 5  # Performance test
+qanchor logs --tail 10 --network mainnet    # View recent logs
+
+# Wallet management
+qanchor wallet create --name dev-wallet     # Create development wallet
+qanchor wallet balance --name dev-wallet    # Check wallet balance
+
+# SDK generation (unchanged)
 qanchor generate --lang ts --output ./ts-sdk  # Generate TypeScript SDK (3s)
 qanchor generate --lang py --output ./py-sdk  # Generate Python SDK (3s)
+
+# Local development (optional)
 qanchor localnet &                          # Start local network
 curl http://localhost:8899/health           # Test API
 qanchor clean                               # Cleanup
@@ -392,3 +432,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Making Qubic development simple!** 🚀
 ⭐ **Star us on GitHub if QAnchor helps your Qubic development!**
+

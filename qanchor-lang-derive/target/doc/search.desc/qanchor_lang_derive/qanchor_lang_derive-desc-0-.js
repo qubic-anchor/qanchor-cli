@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qanchor_lang_derive", 0, "Procedural macros for QAnchor language framework\nThe <code>#[derive(Accounts)]</code> macro\nThe <code>#[program]</code> attribute macro")

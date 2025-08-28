@@ -1,0 +1,40 @@
+[package]
+name = "qubic-rpc"
+version = "0.1.0"
+edition = "2021"
+description = "Qubic blockchain RPC client for QAnchor framework"
+license = "MIT"
+repository = "https://github.com/qubic-network/qanchor-cli"
+keywords = ["qubic", "blockchain", "rpc", "client"]
+categories = ["api-bindings", "cryptography::cryptocurrencies"]
+
+[dependencies]
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+tokio = { version = "1.0", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Encoding
+base64 = "0.22"
+
+# Crypto (for K12 hash and signing)
+sha3 = "0.10"  # For K12 hash implementation
+ed25519-dalek = "2.0"  # For signing
+
+# Utilities
+uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Logging
+log = "0.4"
+
+[dev-dependencies]
+tokio-test = "0.4"
+hex = "0.4"

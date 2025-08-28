@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"attr":["program"],"derive":["Accounts"],"macro":["program_entry","qanchor_assert","qanchor_error"],"mod":["accounts","context","error","prelude","program"],"type":["QAnchorResult"]};
