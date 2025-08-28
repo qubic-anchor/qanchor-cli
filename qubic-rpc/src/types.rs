@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use std::collections::HashMap;
 
 /// Tick information from the last processed tick
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -302,4 +303,192 @@ impl Transaction {
         bytes.extend_from_slice(&self.input_data);
         bytes
     }
+}
+
+// ================================
+// Qubic RPC 2.0 API Types
+// ================================
+
+/// V2 API Query filters for advanced searching
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QueryFilters {
+    /// Filter by input type
+    #[serde(rename = "inputType", skip_serializing_if = "Option::is_none")]
+    pub input_type: Option<String>,
+    /// Filter by transaction type  
+    #[serde(rename = "transactionType", skip_serializing_if = "Option::is_none")]
+    pub transaction_type: Option<String>,
+    /// Filter by execution status
+    #[serde(rename = "executionStatus", skip_serializing_if = "Option::is_none")]
+    pub execution_status: Option<String>,
+}
+
+/// V2 API Query ranges for numeric/string filtering
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct QueryRanges {
+    /// Amount range filter
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub amount: Option<RangeFilter>,
+    /// Tick number range filter  
+    #[serde(rename = "tickNumber", skip_serializing_if = "Option::is_none")]
+    pub tick_number: Option<RangeFilter>,
+    /// Timestamp range filter
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timestamp: Option<RangeFilter>,
+}
+
+/// Range filter for numeric values
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RangeFilter {
+    /// Greater than
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gt: Option<String>,
+    /// Greater than or equal
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gte: Option<String>,
+    /// Less than
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lt: Option<String>,
+    /// Less than or equal
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lte: Option<String>,
+}
+
+/// V2 API Pagination parameters
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Pagination {
+    /// Number of results per page (max 1024)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<u32>,
+    /// Offset for pagination (max 10000)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<u32>,
+}
+
+impl Default for Pagination {
+    fn default() -> Self {
+        Self {
+            size: Some(100),
+            offset: Some(0),
+        }
+    }
+}
+
+/// V2 API Request for getTransactionsForIdentity
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransactionsForIdentityRequest {
+    /// Identity address to query
+    pub identity: String,
+    /// Optional filters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub filters: Option<QueryFilters>,
+    /// Optional ranges
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ranges: Option<QueryRanges>,
+    /// Pagination parameters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pagination: Option<Pagination>,
+}
+
+/// V2 API Enhanced transaction response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransactionV2 {
+    /// Transaction hash/ID
+    #[serde(rename = "txId")]
+    pub tx_id: String,
+    /// Source identity address
+    #[serde(rename = "sourceId")]
+    pub source_id: String,
+    /// Destination identity address  
+    #[serde(rename = "destId")]
+    pub dest_id: String,
+    /// Transaction amount
+    pub amount: String,
+    /// Tick number when transaction was processed
+    #[serde(rename = "tickNumber")]
+    pub tick_number: u64,
+    /// Input type for smart contract calls
+    #[serde(rename = "inputType")]
+    pub input_type: u16,
+    /// Input size
+    #[serde(rename = "inputSize")]
+    pub input_size: u16,
+    /// Input data (base64 encoded)
+    #[serde(rename = "inputHex")]
+    pub input_hex: Option<String>,
+    /// Signature (base64 encoded)
+    #[serde(rename = "signatureHex")]
+    pub signature_hex: String,
+    /// Transaction timestamp
+    pub timestamp: Option<DateTime<Utc>>,
+    /// Execution status
+    #[serde(rename = "executionStatus", skip_serializing_if = "Option::is_none")]
+    pub execution_status: Option<String>,
+    /// Money flew status
+    #[serde(rename = "moneyFlew", skip_serializing_if = "Option::is_none")]
+    pub money_flew: Option<bool>,
+}
+
+/// V2 API Transactions response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransactionsV2Response {
+    /// List of transactions
+    pub transactions: Vec<TransactionV2>,
+    /// Total count of matching transactions
+    #[serde(rename = "totalCount")]
+    pub total_count: u64,
+    /// Current page offset
+    pub offset: u32,
+    /// Page size used
+    pub size: u32,
+}
+
+/// V2 API Enhanced tick data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TickDataV2 {
+    /// Tick number
+    #[serde(rename = "tickNumber")]
+    pub tick_number: u64,
+    /// Epoch number
+    pub epoch: u64,
+    /// Timestamp
+    pub timestamp: DateTime<Utc>,
+    /// Number of transactions in this tick
+    #[serde(rename = "transactionCount")]
+    pub transaction_count: u32,
+    /// Block hash/signature
+    #[serde(rename = "signature")]
+    pub signature: String,
+    /// Computor states
+    #[serde(rename = "computorStates", skip_serializing_if = "Option::is_none")]
+    pub computor_states: Option<HashMap<String, String>>,
+}
+
+/// V2 API Request for tick data queries
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TickDataRequest {
+    /// Optional filters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub filters: Option<QueryFilters>,
+    /// Optional ranges (tick number, timestamp)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ranges: Option<QueryRanges>,
+    /// Pagination parameters
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pagination: Option<Pagination>,
+}
+
+/// V2 API Tick data response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TickDataV2Response {
+    /// List of tick data
+    #[serde(rename = "tickData")]
+    pub tick_data: Vec<TickDataV2>,
+    /// Total count of matching ticks
+    #[serde(rename = "totalCount")]
+    pub total_count: u64,
+    /// Current page offset
+    pub offset: u32,
+    /// Page size used
+    pub size: u32,
 }

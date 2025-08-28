@@ -273,6 +273,167 @@ impl QubicRpcClient {
         &self.base_url
     }
 
+    // ================================
+    // Qubic RPC 2.0 API Methods
+    // ================================
+
+    /// Get transactions for a specific identity using V2 API
+    /// 
+    /// Calls `/getTransactionsForIdentity` endpoint with advanced filtering and pagination
+    pub async fn get_transactions_for_identity_v2(
+        &self,
+        request: &TransactionsForIdentityRequest,
+    ) -> Result<TransactionsV2Response> {
+        with_retry(
+            || async {
+                let url = format!("{}/getTransactionsForIdentity", self.base_url);
+                let response = self.client.post(&url)
+                    .json(request)
+                    .send()
+                    .await?;
+                
+                if !response.status().is_success() {
+                    return Err(QubicRpcError::server_error(format!(
+                        "V2 Transactions query failed: {}", response.status()
+                    )));
+                }
+
+                let transactions: TransactionsV2Response = response.json().await?;
+                Ok(transactions)
+            },
+            &self.retry_config,
+        ).await
+    }
+
+    /// Get tick data using V2 API with advanced filtering
+    /// 
+    /// Calls `/getTickData` endpoint with filtering and pagination support
+    pub async fn get_tick_data_v2(
+        &self,
+        request: &TickDataRequest,
+    ) -> Result<TickDataV2Response> {
+        with_retry(
+            || async {
+                let url = format!("{}/getTickData", self.base_url);
+                let response = self.client.post(&url)
+                    .json(request)
+                    .send()
+                    .await?;
+                
+                if !response.status().is_success() {
+                    return Err(QubicRpcError::server_error(format!(
+                        "V2 Tick data query failed: {}", response.status()
+                    )));
+                }
+
+                let tick_data: TickDataV2Response = response.json().await?;
+                Ok(tick_data)
+            },
+            &self.retry_config,
+        ).await
+    }
+
+    /// Helper method to get transactions for identity with simple filters
+    pub async fn get_identity_transactions(
+        &self,
+        identity: &str,
+        limit: Option<u32>,
+        offset: Option<u32>,
+    ) -> Result<TransactionsV2Response> {
+        let request = TransactionsForIdentityRequest {
+            identity: identity.to_string(),
+            filters: None,
+            ranges: None,
+            pagination: Some(Pagination {
+                size: limit,
+                offset,
+            }),
+        };
+        
+        self.get_transactions_for_identity_v2(&request).await
+    }
+
+    /// Helper method to get transactions with amount filter
+    pub async fn get_transactions_with_amount_filter(
+        &self,
+        identity: &str,
+        min_amount: Option<&str>,
+        max_amount: Option<&str>,
+        limit: Option<u32>,
+    ) -> Result<TransactionsV2Response> {
+        let amount_filter = RangeFilter {
+            gt: None,
+            gte: min_amount.map(|s| s.to_string()),
+            lt: None,
+            lte: max_amount.map(|s| s.to_string()),
+        };
+
+        let request = TransactionsForIdentityRequest {
+            identity: identity.to_string(),
+            filters: None,
+            ranges: Some(QueryRanges {
+                amount: Some(amount_filter),
+                tick_number: None,
+                timestamp: None,
+            }),
+            pagination: Some(Pagination {
+                size: limit,
+                offset: Some(0),
+            }),
+        };
+        
+        self.get_transactions_for_identity_v2(&request).await
+    }
+
+    /// Helper method to get transactions within tick range
+    pub async fn get_transactions_in_tick_range(
+        &self,
+        identity: &str,
+        start_tick: Option<u64>,
+        end_tick: Option<u64>,
+        limit: Option<u32>,
+    ) -> Result<TransactionsV2Response> {
+        let tick_filter = RangeFilter {
+            gt: None,
+            gte: start_tick.map(|t| t.to_string()),
+            lt: None,
+            lte: end_tick.map(|t| t.to_string()),
+        };
+
+        let request = TransactionsForIdentityRequest {
+            identity: identity.to_string(),
+            filters: None,
+            ranges: Some(QueryRanges {
+                amount: None,
+                tick_number: Some(tick_filter),
+                timestamp: None,
+            }),
+            pagination: Some(Pagination {
+                size: limit,
+                offset: Some(0),
+            }),
+        };
+        
+        self.get_transactions_for_identity_v2(&request).await
+    }
+
+    /// Helper method to get recent tick data
+    pub async fn get_recent_ticks(
+        &self,
+        limit: Option<u32>,
+    ) -> Result<TickDataV2Response> {
+        let request = TickDataRequest {
+            filters: None,
+            ranges: None,
+            pagination: Some(Pagination {
+                size: limit,
+                offset: Some(0),
+            }),
+        };
+        
+        self.get_tick_data_v2(&request).await
+    }
+
     /// Make a raw HTTP GET request to the RPC endpoint
     pub async fn raw_get(&self, endpoint: &str) -> Result<Value> {
         let url = format!("{}/{}", self.base_url, endpoint.trim_start_matches('/'));
