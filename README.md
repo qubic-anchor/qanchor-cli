@@ -197,8 +197,110 @@ Network diagnostics and health checking tools.
 ### `qanchor logs [--follow] [--tail <n>] [--since <time>] [--filter <keyword>]`
 View contract logs with real-time streaming and filtering capabilities.
 
+### `qanchor qidl <generate|validate|diff|format>`
+QIDL (Qubic Interface Definition Language) operations for interface management.
+
 ### `qanchor --version`
 Display QAnchor CLI version information.
+
+## 🎨 Project Templates
+
+QAnchor provides multiple project templates to kickstart your development:
+
+### Available Templates
+
+#### 1. `basic-oracle` (Default)
+A simple Oracle contract for price feeds:
+```bash
+qanchor init my-oracle --template basic-oracle
+# or simply
+qanchor init my-oracle
+```
+
+**Features:**
+- Basic price update functionality
+- Simple authority-based access control
+- TypeScript test suite included
+- Perfect for learning QAnchor basics
+
+**Generated Files:**
+- `qanchor.yaml` - Project configuration
+- `src/lib.rs` - Oracle contract implementation
+- `src/oracle.qidl` - Interface definition
+- `tests/oracle.test.ts` - Test suite
+
+#### 2. `defi-amm` (Advanced)
+A full-featured Automated Market Maker (AMM) for DeFi:
+```bash
+qanchor init my-amm --template defi-amm
+```
+
+**Features:**
+- Complete AMM implementation with liquidity pools
+- Token swapping with configurable fees
+- Liquidity provision and removal
+- Advanced slippage protection
+- Comprehensive event system
+- Production-ready DeFi contract
+
+**Generated Files:**
+- `qanchor.yaml` - AMM-specific configuration with `qidl = "src/amm.qidl"`
+- `src/lib.rs` - Full AMM contract implementation
+- `src/amm.qidl` - Comprehensive QIDL with 4 instructions, complex types, and events
+- Advanced README with mathematical formulas and usage examples
+
+**QIDL Configuration (`qanchor.yaml`):**
+```yaml
+[contract]
+name = "MyAMM"
+source = "src/lib.rs"
+qidl = "src/amm.qidl"    # ← AMM-specific QIDL file
+
+[networks]
+local = "http://localhost:8080"
+testnet = "https://testnet-rpc.qubic.org"
+mainnet = "https://rpc.qubic.org"
+```
+
+**QIDL Highlights (`src/amm.qidl`):**
+- **4 Complex Instructions**: `initializePool`, `addLiquidity`, `removeLiquidity`, `swap`
+- **Advanced Account Constraints**: PDA seeds, initialization constraints, signer requirements
+- **Rich Type System**: `LiquidityResult`, `SwapResult`, custom error codes
+- **Event System**: `PoolInitialized`, `LiquidityAdded`, `TokenSwapped` events
+- **Constants**: `MINIMUM_LIQUIDITY`, fee rate limits
+- **Complete Metadata**: Build information, dependencies, timestamps
+
+### Template Usage Workflow
+
+```bash
+# 1. Create project from template
+qanchor init my-project --template defi-amm
+
+# 2. Enter project directory
+cd my-project
+
+# 3. Build and generate QIDL automatically
+qanchor build --verbose
+
+# 4. Validate generated QIDL
+qanchor qidl validate target/qidl/contract.json
+
+# 5. Deploy to testnet
+qanchor deploy --network testnet --yes
+
+# 6. Generate SDKs
+qanchor generate --lang ts --output ./ts-sdk
+qanchor generate --lang py --output ./py-sdk
+```
+
+### Template Selection Guide
+
+| Use Case | Template | Complexity | Features |
+|----------|----------|------------|----------|
+| Learning QAnchor | `basic-oracle` | ⭐ | Simple price feeds |
+| Production Oracle | `basic-oracle` | ⭐⭐ | Extend with custom logic |
+| DeFi Protocol | `defi-amm` | ⭐⭐⭐⭐ | Full AMM functionality |
+| Custom Contract | `basic-oracle` | ⭐⭐ | Use as starting point |
 
 ## 📖 SDK Usage Examples
 

@@ -1,0 +1,24 @@
+name: "{{project_name}}"
+version: "0.1.0"
+description: "A DeFi Automated Market Maker (AMM) built with QAnchor"
+author: "{{author_name}} <{{author_email}}>"
+
+[contract]
+name = "{{project_name_pascal}}AMM"
+source = "src/lib.rs"
+qidl = "src/amm.qidl"
+
+[build]
+target = "wasm32-unknown-unknown"
+optimization = true
+
+[networks]
+local = "http://localhost:8080"
+testnet = "https://testnet-rpc.qubic.org"
+mainnet = "https://rpc.qubic.org"
+
+[dependencies]
+qubic-sdk = "0.1.0"
+
+[dev-dependencies]
+qanchor-testing = "0.1.0"

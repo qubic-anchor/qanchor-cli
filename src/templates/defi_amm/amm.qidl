@@ -1,0 +1,667 @@
+{
+  "version": "1.0.0",
+  "spec": "1.0.0",
+  "program": {
+    "name": "{{project_name_pascal}}AMM",
+    "description": "DeFi Automated Market Maker for token swaps with liquidity pools",
+    "version": "0.1.0",
+    "authors": ["{{project_name}} developer"],
+    "license": "MIT",
+    "repository": "https://github.com/qubic-anchor/{{project_name}}"
+  },
+  "instructions": [
+    {
+      "name": "initializePool",
+      "description": "Create a new liquidity pool for two tokens",
+      "args": [
+        {
+          "name": "tokenA",
+          "type": "PublicKey",
+          "description": "First token in the pair"
+        },
+        {
+          "name": "tokenB", 
+          "type": "PublicKey",
+          "description": "Second token in the pair"
+        },
+        {
+          "name": "feeRate",
+          "type": "u16",
+          "description": "Fee rate in basis points (e.g., 30 = 0.3%)",
+          "validation": {
+            "min": 1,
+            "max": 10000
+          }
+        }
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "type": "LiquidityPool",
+          "mutable": true,
+          "description": "The liquidity pool account to initialize",
+          "constraints": [
+            {
+              "type": "init",
+              "payer": "authority",
+              "space": 256
+            }
+          ]
+        },
+        {
+          "name": "authority",
+          "type": "PublicKey",
+          "mutable": false,
+          "signer": true,
+          "description": "Pool authority who pays for initialization"
+        },
+        {
+          "name": "tokenAVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Token A vault account"
+        },
+        {
+          "name": "tokenBVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Token B vault account"
+        }
+      ],
+      "discriminator": [23, 90, 119, 42, 209, 31, 104, 59],
+      "example": "await program.methods.initializePool(tokenA, tokenB, 30).accounts({...}).rpc()"
+    },
+    {
+      "name": "addLiquidity",
+      "description": "Add liquidity to an existing pool",
+      "args": [
+        {
+          "name": "amountADesired",
+          "type": "u64",
+          "description": "Desired amount of token A to add",
+          "validation": {
+            "min": 1
+          }
+        },
+        {
+          "name": "amountBDesired",
+          "type": "u64",
+          "description": "Desired amount of token B to add",
+          "validation": {
+            "min": 1
+          }
+        },
+        {
+          "name": "amountAMin",
+          "type": "u64",
+          "description": "Minimum amount of token A to add"
+        },
+        {
+          "name": "amountBMin",
+          "type": "u64",
+          "description": "Minimum amount of token B to add"
+        }
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "type": "LiquidityPool",
+          "mutable": true,
+          "description": "The liquidity pool"
+        },
+        {
+          "name": "userTokenAAccount",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "User's token A account"
+        },
+        {
+          "name": "userTokenBAccount",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "User's token B account"
+        },
+        {
+          "name": "poolTokenAVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Pool's token A vault"
+        },
+        {
+          "name": "poolTokenBVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Pool's token B vault"
+        },
+        {
+          "name": "user",
+          "type": "PublicKey",
+          "mutable": false,
+          "signer": true,
+          "description": "User adding liquidity"
+        }
+      ],
+      "returns": {
+        "type": "LiquidityResult",
+        "description": "Result of liquidity addition including LP tokens minted"
+      },
+      "discriminator": [47, 182, 203, 119, 45, 210, 88, 95]
+    },
+    {
+      "name": "removeLiquidity",
+      "description": "Remove liquidity from a pool",
+      "args": [
+        {
+          "name": "lpTokenAmount",
+          "type": "u64",
+          "description": "Amount of LP tokens to burn",
+          "validation": {
+            "min": 1
+          }
+        },
+        {
+          "name": "amountAMin",
+          "type": "u64",
+          "description": "Minimum amount of token A to receive"
+        },
+        {
+          "name": "amountBMin",
+          "type": "u64",
+          "description": "Minimum amount of token B to receive"
+        }
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "type": "LiquidityPool",
+          "mutable": true,
+          "description": "The liquidity pool"
+        },
+        {
+          "name": "userLpTokenAccount",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "User's LP token account"
+        },
+        {
+          "name": "userTokenAAccount",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "User's token A account"
+        },
+        {
+          "name": "userTokenBAccount",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "User's token B account"
+        },
+        {
+          "name": "poolTokenAVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Pool's token A vault"
+        },
+        {
+          "name": "poolTokenBVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Pool's token B vault"
+        },
+        {
+          "name": "user",
+          "type": "PublicKey",
+          "signer": true,
+          "description": "User removing liquidity"
+        }
+      ],
+      "discriminator": [88, 200, 15, 182, 203, 119, 45, 210]
+    },
+    {
+      "name": "swap",
+      "description": "Swap tokens using the AMM",
+      "args": [
+        {
+          "name": "amountIn",
+          "type": "u64",
+          "description": "Amount of input token to swap",
+          "validation": {
+            "min": 1
+          }
+        },
+        {
+          "name": "amountOutMin",
+          "type": "u64",
+          "description": "Minimum amount of output token to receive"
+        },
+        {
+          "name": "tokenAToB",
+          "type": "bool",
+          "description": "Direction of swap: true for A to B, false for B to A"
+        }
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "type": "LiquidityPool",
+          "mutable": true,
+          "description": "The liquidity pool"
+        },
+        {
+          "name": "userSourceAccount",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "User's source token account"
+        },
+        {
+          "name": "userDestinationAccount",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "User's destination token account"
+        },
+        {
+          "name": "poolSourceVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Pool's source token vault"
+        },
+        {
+          "name": "poolDestinationVault",
+          "type": "PublicKey",
+          "mutable": true,
+          "description": "Pool's destination token vault"
+        },
+        {
+          "name": "user",
+          "type": "PublicKey",
+          "signer": true,
+          "description": "User performing the swap"
+        }
+      ],
+      "returns": {
+        "type": "SwapResult",
+        "description": "Result of the swap including actual amounts"
+      },
+      "discriminator": [248, 198, 158, 145, 225, 117, 135, 200]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "LiquidityPool",
+      "description": "Main AMM liquidity pool state",
+      "fields": [
+        {
+          "name": "tokenA",
+          "type": "PublicKey",
+          "description": "First token in the pair"
+        },
+        {
+          "name": "tokenB",
+          "type": "PublicKey",
+          "description": "Second token in the pair"
+        },
+        {
+          "name": "reserveA",
+          "type": "u64",
+          "description": "Reserve amount of token A"
+        },
+        {
+          "name": "reserveB",
+          "type": "u64",
+          "description": "Reserve amount of token B"
+        },
+        {
+          "name": "totalLpSupply",
+          "type": "u64",
+          "description": "Total supply of LP tokens"
+        },
+        {
+          "name": "feeRate",
+          "type": "u16",
+          "description": "Fee rate in basis points"
+        },
+        {
+          "name": "authority",
+          "type": "PublicKey",
+          "description": "Pool authority"
+        },
+        {
+          "name": "tokenAVault",
+          "type": "PublicKey",
+          "description": "Token A vault account"
+        },
+        {
+          "name": "tokenBVault",
+          "type": "PublicKey",
+          "description": "Token B vault account"
+        },
+        {
+          "name": "lpTokenMint",
+          "type": "PublicKey",
+          "description": "LP token mint account"
+        },
+        {
+          "name": "createdAt",
+          "type": "u64",
+          "description": "Pool creation timestamp"
+        },
+        {
+          "name": "bump",
+          "type": "u8",
+          "description": "PDA bump seed"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "LiquidityResult",
+      "description": "Result returned when adding liquidity",
+      "fields": [
+        {
+          "name": "amountA",
+          "type": "u64",
+          "description": "Actual amount of token A added"
+        },
+        {
+          "name": "amountB",
+          "type": "u64",
+          "description": "Actual amount of token B added"
+        },
+        {
+          "name": "lpTokensMinted",
+          "type": "u64",
+          "description": "Amount of LP tokens minted"
+        },
+        {
+          "name": "shareOfPool",
+          "type": "u32",
+          "description": "User's share of pool in basis points"
+        }
+      ]
+    },
+    {
+      "name": "SwapResult",
+      "description": "Result returned when performing a swap",
+      "fields": [
+        {
+          "name": "amountIn",
+          "type": "u64",
+          "description": "Actual input amount"
+        },
+        {
+          "name": "amountOut",
+          "type": "u64",
+          "description": "Actual output amount"
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64",
+          "description": "Fee amount charged"
+        },
+        {
+          "name": "priceImpact",
+          "type": "u32",
+          "description": "Price impact in basis points"
+        },
+        {
+          "name": "newReserveA",
+          "type": "u64",
+          "description": "Pool's new reserve A after swap"
+        },
+        {
+          "name": "newReserveB",
+          "type": "u64",
+          "description": "Pool's new reserve B after swap"
+        }
+      ]
+    },
+    {
+      "name": "PoolStatistics",
+      "description": "Pool statistical information",
+      "fields": [
+        {
+          "name": "totalVolumeA",
+          "type": "u64",
+          "description": "Total volume of token A traded"
+        },
+        {
+          "name": "totalVolumeB",
+          "type": "u64",
+          "description": "Total volume of token B traded"
+        },
+        {
+          "name": "totalFeesCollected",
+          "type": "u64",
+          "description": "Total fees collected by the pool"
+        },
+        {
+          "name": "swapCount",
+          "type": "u32",
+          "description": "Total number of swaps performed"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "PoolInitialized",
+      "description": "Emitted when a new pool is created",
+      "fields": [
+        {
+          "name": "pool",
+          "type": "PublicKey"
+        },
+        {
+          "name": "tokenA",
+          "type": "PublicKey"
+        },
+        {
+          "name": "tokenB",
+          "type": "PublicKey"
+        },
+        {
+          "name": "feeRate",
+          "type": "u16"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "LiquidityAdded",
+      "description": "Emitted when liquidity is added to a pool",
+      "fields": [
+        {
+          "name": "pool",
+          "type": "PublicKey"
+        },
+        {
+          "name": "user",
+          "type": "PublicKey"
+        },
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        },
+        {
+          "name": "lpTokensMinted",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "LiquidityRemoved",
+      "description": "Emitted when liquidity is removed from a pool",
+      "fields": [
+        {
+          "name": "pool",
+          "type": "PublicKey"
+        },
+        {
+          "name": "user",
+          "type": "PublicKey"
+        },
+        {
+          "name": "amountA",
+          "type": "u64"
+        },
+        {
+          "name": "amountB",
+          "type": "u64"
+        },
+        {
+          "name": "lpTokensBurned",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "TokenSwapped",
+      "description": "Emitted when tokens are swapped",
+      "fields": [
+        {
+          "name": "pool",
+          "type": "PublicKey"
+        },
+        {
+          "name": "user",
+          "type": "PublicKey"
+        },
+        {
+          "name": "tokenIn",
+          "type": "PublicKey"
+        },
+        {
+          "name": "tokenOut",
+          "type": "PublicKey"
+        },
+        {
+          "name": "amountIn",
+          "type": "u64"
+        },
+        {
+          "name": "amountOut",
+          "type": "u64"
+        },
+        {
+          "name": "feeAmount",
+          "type": "u64"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InsufficientLiquidity",
+      "message": "Insufficient liquidity for this operation"
+    },
+    {
+      "code": 6001,
+      "name": "SlippageToleranceExceeded",
+      "message": "Slippage tolerance exceeded"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidTokenPair",
+      "message": "Invalid token pair: tokens must be different"
+    },
+    {
+      "code": 6003,
+      "name": "PoolAlreadyExists",
+      "message": "Pool for this token pair already exists"
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientInputAmount",
+      "message": "Insufficient input amount"
+    },
+    {
+      "code": 6005,
+      "name": "InsufficientOutputAmount",
+      "message": "Insufficient output amount"
+    },
+    {
+      "code": 6006,
+      "name": "InsufficientAllowance",
+      "message": "Insufficient token allowance"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidFeeRate",
+      "message": "Fee rate must be between 0.01% and 100%"
+    },
+    {
+      "code": 6008,
+      "name": "MathOverflow",
+      "message": "Mathematical operation resulted in overflow"
+    },
+    {
+      "code": 6009,
+      "name": "PoolNotInitialized",
+      "message": "Pool has not been initialized"
+    }
+  ],
+  "constants": [
+    {
+      "name": "MINIMUM_LIQUIDITY",
+      "value": 1000,
+      "type": "u64",
+      "description": "Minimum initial liquidity that must be locked"
+    },
+    {
+      "name": "MAX_FEE_RATE",
+      "value": 10000,
+      "type": "u16",
+      "description": "Maximum fee rate in basis points (100%)"
+    },
+    {
+      "name": "MIN_FEE_RATE",
+      "value": 1,
+      "type": "u16",
+      "description": "Minimum fee rate in basis points (0.01%)"
+    },
+    {
+      "name": "POOL_SEED",
+      "value": "liquidity_pool",
+      "type": "string",
+      "description": "Seed used for pool PDA derivation"
+    }
+  ],
+  "metadata": {
+    "compiler_version": "0.3.1",
+    "generated_at": "2025-08-29T09:30:00.000000+00:00",
+    "source_hash": "amm_contract_v1",
+    "build_args": ["--optimize", "--features=mainnet"],
+    "dependencies": [
+      {
+        "name": "qanchor-lang",
+        "version": "0.3.1",
+        "type": "crate"
+      },
+      {
+        "name": "qubic-rpc",
+        "version": "0.1.0",
+        "type": "crate"
+      }
+    ]
+  }
+}

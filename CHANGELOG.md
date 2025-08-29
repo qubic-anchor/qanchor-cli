@@ -181,6 +181,23 @@ This is a significant milestone release that brings QAnchor from a development f
 
 ---
 
+## [0.2.1] - 2025-08-29
+
+### ✨ New
+- DeFi AMM template added (`--template defi-amm`): generates `qanchor.yaml` + `src/amm.qidl`.
+- QIDL CLI tools wired: `qanchor qidl generate/validate/format/diff` (with friendly diagnostics).
+
+### 🔧 Improvements
+- Build integrates auto QIDL generation; falls back to basic QIDL when no `#[program]` detected.
+- Network commands and logs validated on mainnet; graceful handling for unavailable endpoints.
+
+### 🧪 QA
+- AMM template init/build/validate tested end-to-end.
+- QIDL diff shows semantic version bumps; invalid JSON emits friendly diagnostics.
+
+### 📚 Docs
+- Plan to extend README with AMM template usage and QIDL tools section.
+
 ## Development Roadmap
 
 ### Phase 3 Remaining (v0.4.0 - Planned)

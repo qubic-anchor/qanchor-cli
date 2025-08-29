@@ -25,6 +25,15 @@ impl Template {
                 handlebars.register_template_string(".gitignore", include_str!("basic_oracle/gitignore"))?;
                 handlebars.register_template_string("LICENSE", include_str!("basic_oracle/LICENSE"))?;
             }
+            "defi-amm" | "defi_amm" => {
+                // Complete AMM template registration
+                handlebars.register_template_string("qanchor.yaml", include_str!("defi_amm/qanchor.yaml"))?;
+                handlebars.register_template_string("amm.qidl", include_str!("defi_amm/amm.qidl"))?;
+                handlebars.register_template_string("lib.rs", include_str!("defi_amm/lib.rs"))?;
+                handlebars.register_template_string("README.md", include_str!("defi_amm/README.md"))?;
+                handlebars.register_template_string(".gitignore", include_str!("basic_oracle/gitignore"))?;
+                handlebars.register_template_string("LICENSE", include_str!("basic_oracle/LICENSE"))?;
+            }
             _ => anyhow::bail!("Unknown template: {}", template_name),
         }
         
@@ -51,9 +60,17 @@ impl Template {
         // 生成檔案
         self.render_file("qanchor.yaml", &target_path.join("qanchor.yaml"), &context)?;
         self.render_file("lib.rs", &target_path.join("src/lib.rs"), &context)?;
-        self.render_file("oracle.qidl", &target_path.join("src/oracle.qidl"), &context)?;
+        // If AMM template, emit src/amm.qidl; else emit src/oracle.qidl
+        if self.name == "defi-amm" || self.name == "defi_amm" {
+            self.render_file("amm.qidl", &target_path.join("src/amm.qidl"), &context)?;
+        } else {
+            self.render_file("oracle.qidl", &target_path.join("src/oracle.qidl"), &context)?;
+        }
         self.render_file("README.md", &target_path.join("README.md"), &context)?;
-        self.render_file("test.ts", &target_path.join("tests/oracle.test.ts"), &context)?;
+        // Only generate default TS test for basic-oracle
+        if self.name == "basic-oracle" {
+            self.render_file("test.ts", &target_path.join("tests/oracle.test.ts"), &context)?;
+        }
         self.render_file(".gitignore", &target_path.join(".gitignore"), &context)?;
         self.render_file("LICENSE", &target_path.join("LICENSE"), &context)?;
         

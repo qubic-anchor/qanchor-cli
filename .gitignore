@@ -34,8 +34,19 @@ Git_Push_Preparation.md
 
 # 營銷和公告檔案 (內部使用)
 twitter-announcement.md
+qubic-rpc-2.0-tweets.md
+qubic-mining-reply.md
+*-tweets.md
+*-announcement.md
+*-reply.md
 
 # 開發測試專案目錄
 test-sdk-gen/
 tmp-acceptance-proj/
+amm-amm/
+amm-demo/
+tmp-amm/
+test-deploy/
+test-*/
+tmp-*/
 

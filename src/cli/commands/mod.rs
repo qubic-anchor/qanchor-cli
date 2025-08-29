@@ -15,6 +15,7 @@ pub mod upgrade;
 pub mod wallet;
 pub mod network;
 pub mod logs;
+pub mod qidl;
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -131,6 +132,11 @@ pub enum Commands {
         /// Target network
         #[arg(short, long)]
         network: Option<String>,
+    },
+    /// QIDL (Qubic Interface Definition Language) operations
+    Qidl {
+        #[command(subcommand)]
+        qidl_command: qidl::QidlCommands,
     },
 }
 
@@ -278,6 +284,10 @@ impl Commands {
                     filter.as_deref(),
                     network.as_deref(),
                 ).await
+            }
+            Commands::Qidl { qidl_command } => {
+                println!("{}", "📋 QIDL operations...".bold());
+                qidl::execute(qidl_command.clone())
             }
         }
     }
